@@ -305,5 +305,170 @@ Please read our contributing guidelines before submitting pull requests to ensur
 This project is created for educational purposes as part of the ALX Software Engineering program.
 
 ---
+# Airbnb Clone Project - Backend
 
-*Last updated: October 2025*
+## Team Roles
+
+### Backend Developer
+**Responsibility:** Designs and implements server-side logic, APIs, and business logic. Creates RESTful endpoints, handles data processing, and ensures smooth communication between the frontend and database. Implements authentication, authorization, and API security measures.
+
+### Frontend Developer
+**Responsibility:** Builds the user interface and client-side functionality. Creates responsive, interactive web pages using modern frameworks, ensures seamless user experience, and integrates with backend APIs to display and manage data.
+
+### Database Administrator (DBA)
+**Responsibility:** Designs and maintains the database schema, optimizes queries for performance, ensures data integrity and security. Manages database backups, recovery procedures, and monitors database health and performance metrics.
+
+### DevOps Engineer
+**Responsibility:** Sets up and maintains CI/CD pipelines, manages cloud infrastructure, and ensures smooth deployment processes. Handles containerization, orchestration, monitoring, and scaling of the application in production environments.
+
+### QA Engineer
+**Responsibility:** Develops and executes test plans, performs manual and automated testing, and ensures code quality. Identifies bugs, verifies fixes, and maintains testing documentation to ensure the application meets quality standards.
+
+### Project Manager
+**Responsibility:** Coordinates team activities, manages project timelines and deliverables, facilitates communication between stakeholders. Ensures project goals are met within budget and timeline constraints while maintaining team productivity.
+
+## Technology Stack
+
+### Django
+**Purpose:** A high-level Python web framework used for building robust RESTful APIs. It provides built-in features for authentication, ORM, admin interface, and security, accelerating backend development with its "batteries-included" approach.
+
+### Django REST Framework
+**Purpose:** A powerful toolkit for building Web APIs in Django. It provides serialization, authentication, viewsets, and browsable APIs, making it easier to create RESTful services with proper HTTP method handling.
+
+### PostgreSQL
+**Purpose:** An advanced open-source relational database management system. It handles complex queries, ensures ACID compliance, supports JSON data types, and provides robust data integrity for storing user profiles, property listings, bookings, and transactions.
+
+### Redis
+**Purpose:** An in-memory data structure store used for caching frequently accessed data, session management, and real-time features. It improves application performance by reducing database load and enabling fast data retrieval.
+
+### Celery
+**Purpose:** A distributed task queue for handling asynchronous operations. It processes background jobs like sending emails, generating reports, and handling payment processing without blocking the main application flow.
+
+### Docker
+**Purpose:** A containerization platform that packages the application with all dependencies. It ensures consistent environments across development, testing, and production, simplifying deployment and scaling.
+
+### GraphQL (Optional)
+**Purpose:** A query language and runtime for APIs that allows clients to request specific data they need. It reduces over-fetching and under-fetching of data, providing more efficient data loading compared to traditional REST endpoints.
+
+## Database Design
+
+### Users
+**Key Fields:**
+- `user_id` (Primary Key): Unique identifier for each user
+- `email`: User's email address for login and communication
+- `username`: Unique username for profile identification
+- `password_hash`: Encrypted password for secure authentication
+- `created_at`: Timestamp of account creation
+
+**Relationships:** A user can have multiple properties (as host), multiple bookings (as guest), multiple reviews (as reviewer), and multiple payment methods.
+
+### Properties
+**Key Fields:**
+- `property_id` (Primary Key): Unique identifier for each property
+- `host_id` (Foreign Key to Users): Reference to the property owner
+- `title`: Property listing title
+- `location`: Geographic location/address
+- `price_per_night`: Rental cost per night
+
+**Relationships:** Belongs to one user (host), can have multiple bookings, multiple reviews, and multiple images.
+
+### Bookings
+**Key Fields:**
+- `booking_id` (Primary Key): Unique identifier for each booking
+- `property_id` (Foreign Key to Properties): Reference to booked property
+- `guest_id` (Foreign Key to Users): Reference to the guest
+- `check_in_date`: Start date of the booking
+- `check_out_date`: End date of the booking
+
+**Relationships:** Belongs to one property, belongs to one user (guest), has one payment transaction, and can have one review.
+
+### Reviews
+**Key Fields:**
+- `review_id` (Primary Key): Unique identifier for each review
+- `property_id` (Foreign Key to Properties): Reference to reviewed property
+- `user_id` (Foreign Key to Users): Reference to the reviewer
+- `rating`: Numerical rating (1-5 stars)
+- `comment`: Text content of the review
+
+**Relationships:** Belongs to one property, belongs to one user (reviewer), and is associated with one completed booking.
+
+### Payments
+**Key Fields:**
+- `payment_id` (Primary Key): Unique identifier for each payment
+- `booking_id` (Foreign Key to Bookings): Reference to associated booking
+- `amount`: Total payment amount
+- `payment_method`: Type of payment (credit card, PayPal, etc.)
+- `transaction_status`: Current status (pending, completed, failed)
+
+**Relationships:** Belongs to one booking, belongs to one user (payer), and linked to payment gateway transaction records.
+
+## Feature Breakdown
+
+### User Management
+Comprehensive system for user registration, authentication, and profile management. Includes features for email verification, password reset, profile updates, and role-based access control (guest/host/admin). Ensures secure user data handling and provides OAuth integration for social media login options.
+
+### Property Management
+Enables hosts to create, update, and manage property listings with detailed information including amenities, photos, availability calendar, and pricing. Supports bulk operations for hosts with multiple properties and provides analytics dashboard for tracking property performance and occupancy rates.
+
+### Booking System
+Core functionality allowing guests to search for properties based on location, dates, and filters. Handles real-time availability checking, booking creation, modification, and cancellation with appropriate policies. Implements conflict resolution for simultaneous booking attempts and manages booking status throughout the lifecycle.
+
+### Search and Filtering
+Advanced search capabilities with multiple filter options including price range, property type, amenities, and location radius. Implements full-text search for property descriptions, auto-suggestions, and saved search preferences. Utilizes database indexing and caching for optimal search performance.
+
+### Review and Rating System
+Allows guests to leave reviews and ratings after completed stays, with host response capabilities. Implements review verification to ensure only actual guests can review properties. Aggregates ratings to display property scores and maintains review history for transparency and trust building.
+
+### Payment Processing
+Secure payment gateway integration supporting multiple payment methods including credit cards and digital wallets. Handles payment authorization, capture, refunds, and split payments between platform and hosts. Implements PCI compliance standards and fraud detection mechanisms for transaction security.
+
+### Notification System
+Real-time and scheduled notifications for booking confirmations, payment receipts, review reminders, and promotional messages. Supports multiple delivery channels including email, SMS, and in-app notifications with user preference management for notification types and frequency.
+
+## API Security
+
+### Authentication
+**Implementation:** JWT (JSON Web Tokens) based authentication system for stateless API access. Tokens are generated upon successful login and include user identity and permissions.
+**Importance:** Ensures only registered users can access protected resources, prevents unauthorized access to personal data, and maintains session security across distributed systems.
+
+### Authorization
+**Implementation:** Role-based access control (RBAC) with granular permissions for different user types (guest, host, admin). Implements resource-level authorization to ensure users can only modify their own data.
+**Importance:** Prevents privilege escalation, protects sensitive operations like payment processing and property management, and ensures data privacy compliance by restricting access based on user roles.
+
+### Rate Limiting
+**Implementation:** API throttling using token bucket algorithm to limit requests per user/IP within specific time windows. Different limits for authenticated vs anonymous users.
+**Importance:** Prevents API abuse and DDoS attacks, ensures fair resource usage among all users, and maintains application performance by preventing server overload.
+
+### Data Encryption
+**Implementation:** HTTPS/TLS for all API communications, encryption at rest for sensitive database fields, and secure password hashing using bcrypt.
+**Importance:** Protects user credentials and payment information from interception, complies with data protection regulations (GDPR, PCI-DSS), and maintains user trust by securing personal information.
+
+### Input Validation
+**Implementation:** Comprehensive validation of all API inputs using serializers, sanitization of user-generated content, and SQL injection prevention through parameterized queries.
+**Importance:** Prevents code injection attacks, ensures data integrity by rejecting malformed requests, and protects against cross-site scripting (XSS) attacks.
+
+## CI/CD Pipeline
+
+### What is CI/CD?
+Continuous Integration (CI) and Continuous Deployment (CD) are DevOps practices that automate the process of integrating code changes, running tests, and deploying applications. CI ensures code changes are regularly merged and tested, while CD automates the deployment of tested code to production environments, reducing manual errors and accelerating delivery cycles.
+
+### Importance for the Project
+CI/CD pipelines ensure code quality through automated testing, enable rapid and reliable deployments, and facilitate team collaboration by providing immediate feedback on code changes. This approach minimizes bugs in production, reduces deployment risks, and allows for quick rollback if issues arise, ensuring the Airbnb clone maintains high availability and reliability.
+
+### Tools and Implementation
+
+**GitHub Actions**
+Automates workflows directly from the GitHub repository, running tests on every pull request and triggering deployments upon successful merges to main branch. Configured with YAML files defining build, test, and deployment stages.
+
+**Docker**
+Containerizes the application ensuring consistency across environments. Build images are created during CI process, tagged with version numbers, and pushed to container registries for deployment.
+
+**pytest/Django Test Framework**
+Automated testing suite running unit tests, integration tests, and API endpoint tests. Ensures code coverage thresholds are met before allowing merges.
+
+**AWS CodeDeploy / Heroku Pipeline**
+Manages deployment to cloud infrastructure, handling blue-green deployments for zero-downtime updates and automatic rollback on deployment failures.
+
+**Monitoring Tools (Sentry/New Relic)**
+Integrated error tracking and performance monitoring to catch issues early in the deployment pipeline and monitor application health post-deployment.
+
